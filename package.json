@@ -1,0 +1,22 @@
+{
+  "name": "exotel",
+  "version": "0.0.0",
+  "description": "Exotel API Helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive tests"
+  },
+  "keywords": [
+    "exotel",
+    "sms"
+  ],
+  "author": "Ramnique Singh",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.39.0",
+    "xml2js": "^0.4.4"
+  },
+  "devDependencies": {
+    "mocha": "^1.21.3"
+  }
+}
