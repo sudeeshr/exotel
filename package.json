@@ -1,6 +1,6 @@
 {
   "name": "exotel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Exotel API helper",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "exotel",
     "sms"
   ],
+  "repository": "ramniquesingh/exotel",
   "author": "Ramnique Singh <mail@ramniquesingh.name> (http://twitter.com/ramniquesingh)",
   "license": "MIT",
   "dependencies": {
