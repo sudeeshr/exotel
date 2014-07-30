@@ -1,78 +1,72 @@
-# Node.js Exotel API helper
+# Exotel API helper for node
 [![NPM version](https://badge.fury.io/js/exotel.svg)](http://badge.fury.io/js/exotel)
 
-Read and write to multiple storage systems through one simple API. All read / writes are streamed so large files are no problem.
-Currently supports serial and parallel writes to:
-* Amazon S3
-* Local disk
+Currently supports:
+* Sending SMS
+* Checking SMS status
 
-### Installation
+More features are coming in. Contributions welcome.
+
+## Installation
 
 ```bash
-npm install distack
+npm install exotel
 ```
 
-### Quick Start
+## Usage
 
 ```js
-var DSS = require('distack');
+var exotel = require('exotel')({
+    id   : // exotel id,
+    token: // exotel token
+});
 
-// init
-var store = new DSS([
-    {
-        'tag' : 'local',
-        'type': 'Disk',
-        'cfg' : {...}
-    },
-    {
-        'tag' : 'cloud',
-        'type': 'S3',
-        'cfg' : {...}
-    }
-]);
-
-// write
-store.write(['local', 'cloud'], 'myKey', 'my/file', function (err) {...});
-
-// read
-try {
-  var readStream = store.read('local', 'myKey');
-} catch(e) {...}
+exotel.sendSMS('9999999999', 'Hi', function (err, res) {
+    // ...
+});
 ```
 
-## Storage services
+## Documentation
 
-### Amazon S3
+###sendSMS(mobile, msg, [statusCallback], callback)
+Sends an SMS
 
+####Arguments
+* `mobile` _(String)_: 10-digit mobile number
+* `msg` _(String)_: Message body
+* `[statusCallback]` _(String)_: An optional URL to call when the message reaches a terminal state (delivered or failed)
+* `callback` _(Function)_: Called as `callback(err, result)` - where `result` is a JSON version of the Exotel xml response:
 ```js
-var store = new DSS([
-    {
-        'tag' : 'cloud',
-        'type': 'S3',
-        'cfg' : {
-            'key'   : '<ACCESS_KEY>',
-            'secret': '<SECRET>',
-            'region': '<REGION>1',
-            'bucket': '<BUCKET_NAME>'
-        }
-    }
-]);
+{
+    Sid        : '<sms_id>',
+    DateUpdated: '2014-07-30 09:44:56',
+    DateCreated: '2014-07-30 09:44:56',
+    DateSent   : '1970-01-01 05:30:00',
+    AccountSid : '<account_id>',
+    To         : '<recipient_mobile>',
+    From       : '/<account_id>',
+    Body       : 'Hi!',
+    BodyIndex  : '',
+    Status     : '<status>', // "queued", "sending", "sent" .. etc.
+    Direction  : 'outbound-api',
+    Price      : '',
+    ApiVersion : '',
+    Uri        : '/v1/Accounts/<account_id>/Sms/Messages/<sms_id>'
+}
 ```
 
-### Local Disk Storage
+###checkSMS(sid, callback)
+Check SMS status
 
-```js
-var store = new DSS([
-    {
-        'tag' : 'local',
-        'type': 'Disk',
-        'cfg' : {
-            'basedir': './uploads'
-        }
-    }
-]);
+####Arguments
+* `sid` _(String)_: Sid in `sendSMS` result
+* `callback` _(Function)_: Called as `callback(err, result)` - where `result` is the same SMS data as above
+
+### Testing
+Install dev dependencies and run:
+```bash
+EXOTEL_ID=<id> EXOTEL_TOKEN=<token> MOBILE=<recipient> npm test
 ```
 
 ### License
 [MIT](LICENSE)
-

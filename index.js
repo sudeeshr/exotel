@@ -1,42 +1,72 @@
-var request = require('request');
-var parseString = require('xml2js').parseString;
+module.exports = function (opts) {
+    var request = require('request');
+    var parseString = require('xml2js').parseString;
+    var apibase = 'https://' + opts.id + ':' + opts.token +
+            '@twilix.exotel.in/v1/Accounts/' + opts.id;
 
-function Exotel(opts) {
-    this.id = opts.id;
-    this.token = opts.token;
-}
+    var exotel = {};
 
-Exotel.prototype = {
-    sendSMS: function (from, to, msg, cb) {
-        var url = 'https://' + this.id + ':' + this.token +
-            '@twilix.exotel.in/v1/Accounts/' + this.id + '/Sms/send';
+    exotel.sendSMS = function (to, msg, statusCb, cb) {
+        if (arguments.length === 3) {
+            cb = arguments[2];
+            statusCb = '';
+        }
 
-        request.post(url, {form: {
-            'From': from,
-            'To'  : to,
-            'Body': msg
-        }}, function (err, res, body) {
+        var data = {
+            'From': '9999999999', // value doesn't matter
+            'To': to,
+            'Body': msg,
+            'StatusCallback': statusCb
+        };
+
+        var url = apibase + '/Sms/send';
+
+        request.post(url, {form: data}, function (err, res, body) {
             if (err) {
                 return cb(err);
             }
 
-            parseString(body, function (err, parsed) {
-                var response = parsed.TwilioResponse;
-
+            parseString(body, {
+                explicitArray: false
+            }, function (err, parsed) {
                 if (err) {
                     return cb(err);
                 }
 
-                if (response.RestException &&
-                    response.RestException.length) {
-                    var ex = response.RestException[0];
-                    return cb(new Error(ex.Status[0] + ': ' + ex.Message[0]));
+                if (res.statusCode !== 200) {
+                    var ex = parsed.TwilioResponse.RestException;
+                    return cb(new Error(ex.Status + ': ' + ex.Message));
                 }
 
-                cb(null, response);
+                cb(null, parsed.TwilioResponse.SMSMessage);
             });
         });
-    }
-};
+    };
 
-module.exports = Exotel;
+    exotel.checkSMS = function (id, cb) {
+        var url = apibase + '/Sms/Messages/' + id;
+
+        request.get(url, function (err, res, body) {
+            if (err) {
+                return cb(err);
+            }
+
+            parseString(body, {
+                explicitArray: false
+            }, function (err, parsed) {
+                if (err) {
+                    return cb(err);
+                }
+
+                if (res.statusCode !== 200) {
+                    var ex = parsed.TwilioResponse.RestException;
+                    return cb(new Error(ex.Status + ': ' + ex.Message));
+                }
+
+                cb(null, parsed.TwilioResponse.SMSMessage);
+            });
+        });
+    };
+
+    return exotel;
+};

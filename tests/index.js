@@ -1,19 +1,39 @@
 var assert = require('assert');
-var Exotel = require('../');
-var exotel = new Exotel({
+var exotel = require('../')({
     id   : process.env.EXOTEL_ID,
     token: process.env.EXOTEL_TOKEN
 });
 
+var id;
+
 describe('exotel', function () {
     describe('#sendSMS()', function () {
         it('should send SMS', function (done) {
-            exotel.sendSMS('9999999999', '9845940393', 'test', function (err, res) {
+            exotel.sendSMS(process.env.MOBILE, 'test', function (err, res) {
                 if (err) {
                     throw err;
                 }
+                assert.ok(res);
+                done();
+            });
+        });
 
-                console.log(require('util').inspect(res, false, 10));
+        it('should send SMS with status callback', function (done) {
+            exotel.sendSMS(process.env.MOBILE, 'test', 'http://test.url', function (err, res) {
+                if (err) {
+                    throw err;
+                }
+                assert.ok(res);
+                id = res.Sid;
+                done();
+            });
+        });
+
+        it('should check sms status', function (done) {
+            exotel.checkSMS(id, function (err, res) {
+                if (err) {
+                    throw err;
+                }
                 assert.ok(res);
                 done();
             });
