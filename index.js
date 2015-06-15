@@ -6,9 +6,15 @@ module.exports = function (opts) {
 
     var exotel = {};
 
-    exotel.sendSMS = function (to, msg, statusCb, cb) {
+    exotel.sendSMS = function (to, msg, priority, statusCb, cb) {
         if (arguments.length === 3) {
             cb = arguments[2];
+            priority = 'normal';
+            statusCb = '';
+        }
+        
+        if (arguments.length === 4) {
+            cb = arguments[3];
             statusCb = '';
         }
 
@@ -16,6 +22,7 @@ module.exports = function (opts) {
             'From': '9999999999', // value doesn't matter
             'To': to,
             'Body': msg,
+            'Priority': priority,
             'StatusCallback': statusCb
         };
 
