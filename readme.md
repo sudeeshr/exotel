@@ -28,12 +28,13 @@ exotel.sendSMS('9999999999', 'Hi', function (err, res) {
 
 ## Documentation
 
-###sendSMS(mobile, msg, [statusCallback], callback)
+###sendSMS(mobile, msg, [priority], [statusCallback], callback)
 Sends an SMS
 
 ####Arguments
 * `mobile` _(String)_: 10-digit mobile number
 * `msg` _(String)_: Message body
+* `priority` _(String)_: Message priority. Defaults to 'normal'
 * `[statusCallback]` _(String)_: An optional URL to call when the message reaches a terminal state (delivered or failed)
 * `callback` _(Function)_: Called as `callback(err, result)` - where `result` is a JSON version of the Exotel xml response:
 ```js
