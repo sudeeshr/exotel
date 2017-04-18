@@ -42,7 +42,10 @@ module.exports = function (opts) {
 
                 if (res.statusCode !== 200) {
                     var ex = parsed.TwilioResponse.RestException;
-                    return cb(new Error(ex.Status + ': ' + ex.Message));
+                    if(ex){ // this is undefined most of the time, 
+                        // which causes exception 'Status of undefined'
+                        return cb(new Error(ex.Status + ': ' + ex.Message));
+                    }
                 }
 
                 cb(null, parsed.TwilioResponse.SMSMessage);
@@ -67,7 +70,10 @@ module.exports = function (opts) {
 
                 if (res.statusCode !== 200) {
                     var ex = parsed.TwilioResponse.RestException;
-                    return cb(new Error(ex.Status + ': ' + ex.Message));
+                    if(ex){ // this is undefined most of the time, 
+                        // which causes exception 'Status of undefined'
+                        return cb(new Error(ex.Status + ': ' + ex.Message));
+                    }
                 }
 
                 cb(null, parsed.TwilioResponse.SMSMessage);
